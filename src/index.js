@@ -20,58 +20,68 @@ dayjs.extend(dayjsRelativeTime);
 dayjs.extend(advancedFormat);
 
 // dayjs timezone config
-let tzLocal = dayjs.tz.guess(); // gets local client timezone - Europe/Madrid (CET)
-tzLocal = "Europe/London"; // reassign to specific timezone - America/New_York (EST)
-dayjs.tz.setDefault(tzLocal); // sets default timezone ONLY when .tz() is chained !!
+let tzLocal = dayjs.tz.guess(); 
+tzLocal = "Europe/London"; 
+dayjs.tz.setDefault(tzLocal); 
 
-/**
- * NOTE: benchmarks for Number(string) VS parseInt(string, 10)
- * show Number() approx 33% faster performance
- * ref: http://phrogz.net/js/string_to_number.html
- */
 
 const FormatHelper = {
   formatDateLocal: (date) => {
     // LOCAL timezone - Europe/Madrid (CET)
-    // IGNORES dayjs.tz.setDefault() setting because .tz() NOT chained
-    return dayjs(Number(date)).format("DD MMMM YYYY HH:mm:ss:SSS");
+    
+    return dayjs(Number(date)).format("DD MMMM YYYY HH:mm:ss:SSS");  // to local format - 
   },
   formatDateUTC: (date) => {
     // UTC universal time
-    // IGNORES dayjs.tz.setDefault() setting because .tz() NOT chained
+
     return dayjs.utc(Number(date)).format("DD MMMM YYYY HH:mm:ss:SSS");
   },
   formatDateLondon: (date) => {
     // America/New_York (EST) - set by dayjs.tz.setDefault()
     dayjs.tz.setDefault("Europe/London");
+    //dayjs.tz.setDefault("Europe/London");
     return dayjs(Number(date)).tz().format("DD MMMM YYYY HH:mm:ss:SSS");
+  },
+  formatDateBrowseApp: (date) => {
+    // America/New_York (EST) - set by dayjs.tz.setDefault()
+    dayjs.tz.setDefault("Europe/London");
+    const todayDate = dayjs(date).tz().startOf('day') 
+    console.log(todayDate.format())
+    console.log("BOolean", dayjs(todayDate).tz().isSame("2022-03-27T00:00:00Z", "day"))  // false
+    return  dayjs(todayDate).tz().format("DD MMMM YYYY HH:mm:ss:SSS");  // Local time to Europe London
   },
   formatDateNYC: (date) => {
     // America/New_York (EST) - set by dayjs.tz.setDefault()
-    // dayjs.tz.setDefault("America/New_York");
-    dayjs.tz.setDefault("Europe/London");
+     dayjs.tz.setDefault("America/New_York");
+    //dayjs.tz.setDefault("Europe/London");
     return dayjs(Number(date)).tz().format("DD MMMM YYYY HH:mm:ss:SSS");
   },
   formatDateIST: (date) => {
     // America/New_York (EST) - set by dayjs.tz.setDefault()
-    // dayjs.tz.setDefault("Asia/Kolkata");
-    dayjs.tz.setDefault("Europe/London");
+     dayjs.tz.setDefault("Asia/Kolkata");
+    //dayjs.tz.setDefault("Europe/London");
     return dayjs(Number(date)).tz().format("DD MMMM YYYY HH:mm:ss:SSS");
   }
 };
 
+
 //const now = String(Date.now()); // timestamps will be fetched as strings
-const UTCdate = new Date("2022-03-27T03:00:00Z");
+const UTCdate = "2022-03-25T23:00:00Z"  //  view Slots 
 const dateFormat = "YYYY-MM-DDTHH:mm:ss";
 // console.log(UTCdate.getTime());
 
 const convertedDate = dayjs(UTCdate, dateFormat);
+// const todayDate = toDate(null).startOf('day') 
+//   return toDate(todayDate).isSame(date, 'day')
 
-console.log(convertedDate);
-console.log(convertedDate.startOf("day"));
-console.log(convertedDate.startOf("month"));
 
-const now = UTCdate.getTime();
+// console.log(convertedDate);
+// console.log(convertedDate.startOf("day"));
+// console.log(convertedDate.startOf("month"));
+
+
+
+const now = convertedDate.$d.getTime();
 
 const App = () => {
   return (
@@ -151,6 +161,18 @@ const App = () => {
           <Box display="flex" alignItems="center">
             <Box flex="2 1 0">
               <strong>
+              formatDateBrowseApp(now){" "}
+                <span style={{ color: "silver" }}>
+                  set by dayjs.tz.setDefault("Europe/London")
+                </span>
+              </strong>
+            </Box>
+            <Box flex="3 1 0"> {FormatHelper.formatDateBrowseApp(now)}</Box>
+          </Box>
+          <hr />
+          <Box display="flex" alignItems="center">
+            <Box flex="2 1 0">
+              <strong>
                 formatDateIST(now){" "}
                 <span style={{ color: "silver" }}>
                   set by dayjs.tz.setDefault("Asia/Kolkata")
@@ -171,6 +193,7 @@ const App = () => {
             </Box>
             <Box flex="3 1 0"> {FormatHelper.formatDateNYC(now)}</Box>
           </Box>
+          
         </div>
       </AppWrapper>
     </ThemeProvider>
